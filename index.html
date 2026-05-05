@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Curadoria OJS: antes de publicar</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: #f8fafc;
+      font-family: 'Nunito', Arial, sans-serif;
+      overflow-x: hidden;
+    }
+
+    .full-screen-img {
+      width: 100%;
+      height: 100vh;
+      object-fit: cover;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .overlay-button {
+      position: absolute;
+      cursor: pointer;
+      width: 160px;
+      height: 50px;
+      z-index: 10;
+    }
+
+    .btn-continuar {
+      top: 86%;
+      left: 18%;
+    }
+
+    .nome-box {
+      position: absolute;
+      z-index: 10;
+      top: 58%;
+      left: 7%;
+      width: min(430px, 86vw);
+      background: rgba(255, 255, 255, 0.94);
+      border: 2px solid #1d4ed8;
+      border-radius: 18px;
+      padding: 1rem;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.18);
+    }
+
+    .card {
+      perspective: 1000px;
+      width: 100%;
+      height: 0;
+      padding-bottom: 100%;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .card-inner {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.55s;
+      transform-style: preserve-3d;
+    }
+
+    .card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 0.75rem;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
+    }
+
+    .card-front {
+      color: white;
+    }
+
+    .card-front.concept {
+      background-color: #244c76;
+    }
+
+    .card-front.definition {
+      background-color: #7eb1db;
+    }
+
+    .card-back {
+      background-color: white;
+      transform: rotateY(180deg);
+      color: #1f2937;
+      border: 2px solid #dbeafe;
+    }
+
+    .card-label {
+      font-weight: 800;
+      margin-bottom: 0.45rem;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      text-align: center;
+    }
+
+    .card-content {
+      font-size: 0.78rem;
+      line-height: 1.22;
+      text-align: center;
+    }
+
+    .card-icon {
+      font-size: 1.45rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.60);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1rem;
+    }
+
+    .modal-card {
+      width: min(560px, 92vw);
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 1.5rem;
+      box-shadow: 0 25px 60px rgba(15, 23, 42, 0.30);
+      border: 4px solid #bfdbfe;
+      animation: pop 0.18s ease-out;
+    }
+
+    @keyframes pop {
+      from {
+        transform: scale(0.92);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .leaderboard-card {
+      background: #ffffff;
+      border: 2px solid #bfdbfe;
+      border-radius: 1rem;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+    }
+
+    .leaderboard-rank {
+      border-bottom: 1px solid #dbeafe;
+      padding: 0.65rem 0;
+    }
+
+    .leaderboard-rank:last-child {
+      border-bottom: none;
+    }
+
+    .medal-1 {
+      background: linear-gradient(135deg, #fef3c7, #ffffff);
+      border-radius: 0.75rem;
+      padding: 0.5rem;
+    }
+
+    .medal-2 {
+      background: linear-gradient(135deg, #e5e7eb, #ffffff);
+      border-radius: 0.75rem;
+      padding: 0.5rem;
+    }
+
+    .medal-3 {
+      background: linear-gradient(135deg, #fed7aa, #ffffff);
+      border-radius: 0.75rem;
+      padding: 0.5rem;
+    }
+
+    @media (max-width: 1024px) {
+      #game-layout {
+        grid-template-columns: 1fr !important;
+      }
+
+      #leaderboard {
+        order: -1;
+        position: static;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .card-content {
+        font-size: 0.66rem;
+      }
+
+      .card-label {
+        font-size: 0.58rem;
+      }
+
+      .card-front, .card-back {
+        padding: 0.5rem;
+      }
+
+      .nome-box {
+        top: 52%;
+        left: 5%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- TELA 1: tela inicial já existente -->
+  <div id="tela1" class="relative w-full h-screen">
+    <img src="telas/tela-inicial-1.svg" alt="Tela inicial" class="full-screen-img" />
+
+    <img
+      src="botoes/button-continuar.svg"
+      alt="Botão continuar"
+      class="overlay-button btn-continuar"
+      onclick="irParaTela2()"
+    />
+  </div>
+
+  <!-- TELA 2: tela de mecânica já existente -->
+  <div id="tela2" class="relative w-full h-screen hidden">
+    <img src="telas/tela-inicial-2.svg" alt="Tela de mecânica do jogo" class="full-screen-img" />
+
+    <div class="nome-box">
+      <label for="player-name" class="block text-blue-900 font-bold mb-2">
+        Nome do aluno ou dupla
+      </label>
+
+      <input
+        id="player-name"
+        type="text"
+        maxlength="40"
+        class="w-full border-2 border-blue-300 rounded-xl px-4 py-3 text-lg outline-none focus:border-blue-700"
+        placeholder="Ex.: Ana e João"
+      />
+
+      <p id="name-error" class="text-red-600 font-semibold mt-2 hidden">
+        Digite um nome para começar.
+      </p>
+
+      <button
+        class="mt-4 w-full bg-blue-700 hover:bg-blue-800 text-white px-8 py-4 rounded-xl font-bold shadow-lg"
+        onclick="iniciarJogo()"
+      >
+        Começar jogo
+      </button>
+    </div>
+  </div>
+
+  <!-- JOGO -->
+  <div id="jogo" class="hidden min-h-screen p-4 bg-slate-50">
+    <div class="max-w-[1500px] mx-auto">
+
+      <header class="text-center mb-5">
+        <h1 class="text-3xl md:text-4xl font-bold text-blue-800">
+          Curadoria de metadados no OJS
+        </h1>
+        <p class="text-blue-600 text-lg">
+          Encontre os pares entre campos do OJS e ações de conferência
+        </p>
+      </header>
+
+      <main id="game-layout" class="grid grid-cols-[1fr_310px] gap-5 items-start">
+
+        <!-- ÁREA PRINCIPAL DO JOGO -->
+        <section>
+          <div class="mb-4 flex flex-wrap justify-center gap-3 text-sm md:text-base">
+            <div class="bg-white border border-blue-200 rounded-xl px-4 py-2 shadow-sm">
+              👤 <strong>Jogador:</strong> <span id="current-player">—</span>
+            </div>
+
+            <div class="bg-white border border-blue-200 rounded-xl px-4 py-2 shadow-sm">
+              ✅ <strong>Acertos:</strong> <span id="matches-count">0</span>
+            </div>
+
+            <div class="bg-white border border-blue-200 rounded-xl px-4 py-2 shadow-sm">
+              🎯 <strong>Tentativas:</strong> <span id="attempts-count">0</span>
+            </div>
+
+            <div class="bg-white border border-blue-200 rounded-xl px-4 py-2 shadow-sm">
+              ❌ <strong>Erros:</strong> <span id="errors-count">0</span>
+            </div>
+
+            <div class="bg-white border border-blue-200 rounded-xl px-4 py-2 shadow-sm">
+              ⭐ <strong>Pontos:</strong> <span id="score-count">0</span>
+            </div>
+          </div>
+
+          <div class="mb-4 flex flex-wrap justify-center gap-3">
+            <button
+              id="restart-btn"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition"
+            >
+              🔄 Reiniciar jogo
+            </button>
+
+            <button
+              id="refresh-leaderboard-btn"
+              class="bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-lg font-semibold transition"
+            >
+              🏆 Atualizar placar
+            </button>
+          </div>
+
+          <section
+            id="game-board"
+            class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4 max-w-[1120px] mx-auto"
+          >
+          </section>
+        </section>
+
+        <!-- PLACAR GLOBAL -->
+        <aside id="leaderboard" class="leaderboard-card p-4 sticky top-4">
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <h2 class="text-2xl font-extrabold text-blue-900">
+              🏆 Placar geral
+            </h2>
+
+            <button
+              onclick="carregarPlacarGlobal()"
+              class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-900 px-2 py-1 rounded-lg font-bold"
+            >
+              atualizar
+            </button>
+          </div>
+
+          <p class="text-sm text-slate-500 mb-4">
+            Top 5 acumulado
+          </p>
+
+          <div id="leaderboard-list">
+            <p class="text-slate-500">Carregando placar...</p>
+          </div>
+
+          <p class="text-xs text-slate-400 mt-4">
+            O placar é carregado da planilha Google vinculada ao jogo.
+          </p>
+        </aside>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- MODAL DE FEEDBACK -->
+  <div id="feedback-modal" class="modal-backdrop">
+    <div class="modal-card text-center">
+      <div id="modal-icon" class="text-5xl mb-3">💬</div>
+
+      <h2 id="modal-title" class="text-2xl font-extrabold text-blue-900 mb-3">
+        Mensagem
+      </h2>
+
+      <p id="modal-message" class="text-slate-700 text-lg leading-relaxed"></p>
+
+      <div id="modal-extra-actions" class="hidden mt-6 flex flex-wrap justify-center gap-3">
+        <button
+          id="modal-play-again-btn"
+          class="bg-blue-700 hover:bg-blue-800 text-white px-6 py-3 rounded-xl font-bold shadow-lg"
+        >
+          Jogar novamente
+        </button>
+
+        <button
+          id="modal-refresh-ranking-btn"
+          class="bg-slate-700 hover:bg-slate-800 text-white px-6 py-3 rounded-xl font-bold shadow-lg"
+        >
+          Ver placar atualizado
+        </button>
+      </div>
+
+      <button
+        id="modal-ok-btn"
+        class="mt-6 bg-blue-700 hover:bg-blue-800 text-white px-8 py-3 rounded-xl font-bold shadow-lg"
+      >
+        OK
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby5Ah87v-p7f0LbF1HQ5ybRbn-S3N0akM-_i1qNwnNO3c-UcqS0vOlb6WDEJnxm8y_SpA/exec";
+
+    const cardPairs = [
+      {
+        concept: "Título",
+        definition: "Conferir se corresponde ao PDF final e se está no campo correto do OJS.",
+        feedback: "Boa! Título inconsistente entre PDF e OJS prejudica recuperação, citação e confiabilidade do registro."
+      },
+      {
+        concept: "Resumo",
+        definition: "Verificar se descreve o conteúdo do artigo e apoia recuperação e indexação.",
+        feedback: "Boa! O resumo ajuda leitores e sistemas a compreenderem rapidamente o conteúdo do artigo."
+      },
+      {
+        concept: "Palavras-chave",
+        definition: "Checar se representam o conteúdo, estão separadas corretamente e evitam termos genéricos.",
+        feedback: "Boa! Palavras-chave genéricas reduzem a precisão da recuperação e da descoberta do artigo."
+      },
+      {
+        concept: "Autoria",
+        definition: "Conferir nome, ordem dos autores, e-mail, afiliação e responsabilidade no registro.",
+        feedback: "Boa! Autoria correta garante atribuição, responsabilidade editorial e identificação dos autores."
+      },
+      {
+        concept: "Afiliação",
+        definition: "Padronizar instituição, cidade e país, evitando variações desnecessárias.",
+        feedback: "Boa! Afiliação padronizada melhora a identificação institucional e a consistência dos metadados."
+      },
+      {
+        concept: "ORCID",
+        definition: "Verificar se identifica corretamente o autor e reduz ambiguidades de autoria.",
+        feedback: "Boa! ORCID reduz ambiguidades e conecta o autor ao registro editorial de forma persistente."
+      },
+      {
+        concept: "DOI",
+        definition: "Checar se o identificador persistente está associado a metadados corretos e atualizados.",
+        feedback: "Boa! DOI persistente depende de metadados corretos, completos e atualizados."
+      },
+      {
+        concept: "Licença",
+        definition: "Conferir se as permissões de uso aparecem de forma clara no OJS e no artigo.",
+        feedback: "Boa! A licença informa permissões de uso, compartilhamento e reutilização do artigo."
+      },
+      {
+        concept: "Referências",
+        definition: "Verificar norma da revista, completude e presença de DOI ou URL quando houver.",
+        feedback: "Boa! Referências completas fortalecem rastreabilidade e conexão entre documentos científicos."
+      },
+      {
+        concept: "Datas editoriais",
+        definition: "Conferir submissão, aceite e publicação no registro e no documento final.",
+        feedback: "Boa! Datas editoriais documentam o percurso do artigo no fluxo editorial."
+      }
+    ];
+
+    let cards = [];
+    let flipped = [];
+    let locked = false;
+
+    let currentPlayer = "";
+    let matches = 0;
+    let attempts = 0;
+    let errors = 0;
+    let score = 0;
+    let startTime = null;
+    let pendingAfterModal = null;
+
+    const board = () => document.getElementById("game-board");
+
+    function irParaTela2() {
+      document.getElementById("tela1").classList.add("hidden");
+      document.getElementById("tela2").classList.remove("hidden");
+
+      setTimeout(() => {
+        document.getElementById("player-name").focus();
+      }, 100);
+    }
+
+    function iniciarJogo() {
+      const nameInput = document.getElementById("player-name");
+      const nameError = document.getElementById("name-error");
+      const nome = nameInput.value.trim();
+
+      if (!nome) {
+        nameError.classList.remove("hidden");
+        nameInput.focus();
+        return;
+      }
+
+      nameError.classList.add("hidden");
+      currentPlayer = nome;
+
+      document.getElementById("tela2").classList.add("hidden");
+      document.getElementById("jogo").classList.remove("hidden");
+      document.getElementById("current-player").textContent = currentPlayer;
+
+      initGame();
+      carregarPlacarGlobal();
+    }
+
+    document.getElementById("player-name").addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        iniciarJogo();
+      }
+    });
+
+    function initGame() {
+      cards = [];
+      flipped = [];
+      locked = false;
+
+      matches = 0;
+      attempts = 0;
+      errors = 0;
+      score = 0;
+      startTime = Date.now();
+
+      updateStats();
+      board().innerHTML = "";
+
+      cardPairs.forEach((pair, i) => {
+        cards.push({ type: "concept", content: pair.concept, id: i });
+        cards.push({ type: "definition", content: pair.definition, id: i });
+      });
+
+      shuffle(cards).forEach(card => {
+        const el = document.createElement("div");
+        el.className = "card";
+        el.setAttribute("role", "button");
+        el.setAttribute("tabindex", "0");
+        el.setAttribute("aria-label", "Carta do jogo da memória");
+
+        el.innerHTML = `
+          <div class="card-inner">
+            <div class="card-front ${card.type}">
+              <div class="card-icon">${card.type === "concept" ? "🧩" : "🔎"}</div>
+              <div class="card-label">${card.type === "concept" ? "Campo no OJS" : "Conferência"}</div>
+              <div class="card-content">${card.type === "concept" ? card.content : "Clique para revelar"}</div>
+            </div>
+            <div class="card-back">
+              <div class="card-label">${card.type === "concept" ? "Campo no OJS" : "Conferência"}</div>
+              <div class="card-content">${card.content}</div>
+            </div>
+          </div>
+        `;
+
+        el.onclick = () => handleFlip(el, card);
+
+        el.addEventListener("keydown", function(event) {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            handleFlip(el, card);
+          }
+        });
+
+        board().appendChild(el);
+      });
+    }
+
+    function handleFlip(element, card) {
+      if (
+        locked ||
+        element.classList.contains("matched") ||
+        flipped.find(f => f.element === element)
+      ) {
+        return;
+      }
+
+      element.classList.add("flipped");
+      flipped.push({ element, id: card.id });
+
+      if (flipped.length === 2) {
+        attempts++;
+        locked = true;
+
+        const [a, b] = flipped;
+
+        if (a.id === b.id) {
+          processarAcerto(a, b);
+        } else {
+          processarErro(a, b);
+        }
+      }
+    }
+
+    function processarAcerto(a, b) {
+      matches++;
+      score += 10;
+
+      a.element.classList.add("matched");
+      b.element.classList.add("matched");
+
+      updateStats();
+
+      const parEncontrado = cardPairs[a.id];
+
+      showModal({
+        icon: "✅",
+        title: "Par encontrado!",
+        message: parEncontrado.feedback || "Boa! Par encontrado.",
+        onOk: () => {
+          flipped = [];
+          locked = false;
+
+          if (matches === cardPairs.length) {
+            finalizarJogo();
+          }
+        }
+      });
+    }
+
+    function processarErro(a, b) {
+      errors++;
+      score = Math.max(0, score - 2);
+
+      updateStats();
+
+      showModal({
+        icon: "💡",
+        title: "Tente outra vez!",
+        message: "Essas cartas não formam um par. Observe o campo do OJS e pense qual ação de conferência combina com ele.",
+        onOk: () => {
+          a.element.classList.remove("flipped");
+          b.element.classList.remove("flipped");
+          flipped = [];
+          locked = false;
+        }
+      });
+    }
+
+    function finalizarJogo() {
+      const totalSeconds = Math.round((Date.now() - startTime) / 1000);
+
+      const bonusErros = Math.max(0, 20 - (errors * 2));
+      const bonusTempo = Math.max(0, 20 - Math.floor(totalSeconds / 15));
+      const finalScore = score + bonusErros + bonusTempo;
+
+      score = finalScore;
+      updateStats();
+
+      const resultado = {
+        nome: currentPlayer,
+        acertos: matches,
+        tentativas: attempts,
+        erros: errors,
+        pontos: finalScore,
+        tempo: totalSeconds,
+        data: new Date().toLocaleString("pt-BR")
+      };
+
+      salvarResultadoLocal(resultado);
+      enviarResultadoGlobal(resultado);
+
+      setTimeout(() => {
+        dispararConfetes();
+
+        showModal({
+          icon: "🎉",
+          title: "Parabéns!",
+          message: `Você concluiu a curadoria inicial! Pontuação final: ${finalScore} pontos. O resultado será enviado para o placar geral.`,
+          final: true,
+          onOk: () => {
+            carregarPlacarGlobal();
+          }
+        });
+      }, 400);
+    }
+
+    function updateStats() {
+      document.getElementById("matches-count").textContent = matches;
+      document.getElementById("attempts-count").textContent = attempts;
+      document.getElementById("errors-count").textContent = errors;
+      document.getElementById("score-count").textContent = score;
+    }
+
+    function shuffle(array) {
+      return [...array].sort(() => Math.random() - 0.5);
+    }
+
+    function dispararConfetes() {
+      confetti({
+        particleCount: 170,
+        spread: 75,
+        origin: { y: 0.6 }
+      });
+    }
+
+    function showModal({ icon, title, message, onOk, final = false }) {
+      document.getElementById("modal-icon").textContent = icon || "💬";
+      document.getElementById("modal-title").textContent = title || "Mensagem";
+      document.getElementById("modal-message").textContent = message || "";
+      pendingAfterModal = onOk || null;
+
+      const extraActions = document.getElementById("modal-extra-actions");
+      const okBtn = document.getElementById("modal-ok-btn");
+
+      if (final) {
+        extraActions.classList.remove("hidden");
+        okBtn.textContent = "Fechar";
+      } else {
+        extraActions.classList.add("hidden");
+        okBtn.textContent = "OK";
+      }
+
+      document.getElementById("feedback-modal").style.display = "flex";
+      okBtn.focus();
+    }
+
+    document.getElementById("modal-ok-btn").addEventListener("click", fecharModalFeedback);
+
+    function fecharModalFeedback() {
+      document.getElementById("feedback-modal").style.display = "none";
+
+      if (typeof pendingAfterModal === "function") {
+        const callback = pendingAfterModal;
+        pendingAfterModal = null;
+        callback();
+      }
+    }
+
+    document.getElementById("modal-play-again-btn").addEventListener("click", function() {
+      document.getElementById("feedback-modal").style.display = "none";
+      initGame();
+    });
+
+    document.getElementById("modal-refresh-ranking-btn").addEventListener("click", function() {
+      carregarPlacarGlobal();
+    });
+
+    document.addEventListener("keydown", function(event) {
+      const modalAberto = document.getElementById("feedback-modal").style.display === "flex";
+
+      if (modalAberto && event.key === "Enter") {
+        fecharModalFeedback();
+      }
+    });
+
+    function carregarPlacarGlobal() {
+      const container = document.getElementById("leaderboard-list");
+
+      container.innerHTML = `
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 text-blue-900 text-sm font-semibold">
+          Carregando placar...
+        </div>
+      `;
+
+      const callbackName = "receberPlacar_" + Date.now();
+
+      window[callbackName] = function(ranking) {
+        renderizarPlacarGlobal(ranking);
+        delete window[callbackName];
+
+        const oldScript = document.getElementById(callbackName);
+        if (oldScript) oldScript.remove();
+      };
+
+      const script = document.createElement("script");
+      script.id = callbackName;
+      script.src = `${GOOGLE_SCRIPT_URL}?callback=${callbackName}&t=${Date.now()}`;
+
+      script.onerror = function() {
+        container.innerHTML = `
+          <div class="bg-red-50 border border-red-200 rounded-xl p-3 text-red-700 text-sm font-semibold">
+            Não foi possível carregar o placar. Verifique a URL e a implantação do Apps Script.
+          </div>
+        `;
+      };
+
+      document.body.appendChild(script);
+    }
+
+    function renderizarPlacarGlobal(ranking) {
+      const container = document.getElementById("leaderboard-list");
+
+      if (!Array.isArray(ranking) || ranking.length === 0) {
+        container.innerHTML = `
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-600 text-sm">
+            Ainda não há resultados no placar.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = ranking.map((item, index) => {
+        const medal = index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : "⭐";
+        const medalClass = index === 0 ? "medal-1" : index === 1 ? "medal-2" : index === 2 ? "medal-3" : "";
+
+        return `
+          <div class="leaderboard-rank ${medalClass}">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="font-extrabold text-blue-900">
+                  ${medal} ${index + 1}º ${escapeHtml(item.nome)}
+                </p>
+                <p class="text-xs text-slate-500 mt-1">
+                  ${Number(item.acertos)} acertos · ${Number(item.erros)} erros
+                </p>
+                <p class="text-xs text-slate-500">
+                  ${Number(item.tentativas)} tentativas · ${formatTempo(Number(item.tempo))}
+                </p>
+              </div>
+
+              <div class="text-right">
+                <p class="text-xl font-extrabold text-blue-700">${Number(item.pontos)}</p>
+                <p class="text-xs text-slate-400">pts</p>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function enviarResultadoGlobal(resultado) {
+      fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        body: JSON.stringify(resultado)
+      })
+      .then(() => {
+        setTimeout(carregarPlacarGlobal, 1500);
+      })
+      .catch(error => {
+        console.error("Erro ao enviar resultado:", error);
+      });
+    }
+
+    document.getElementById("refresh-leaderboard-btn").addEventListener("click", carregarPlacarGlobal);
+
+    function salvarResultadoLocal(resultado) {
+      const saved = localStorage.getItem("rankingCuradoriaOJSLocal");
+      const ranking = saved ? JSON.parse(saved) : [];
+
+      ranking.push(resultado);
+
+      ranking.sort((a, b) => {
+        if (b.pontos !== a.pontos) return b.pontos - a.pontos;
+        if (b.acertos !== a.acertos) return b.acertos - a.acertos;
+        if (a.erros !== b.erros) return a.erros - b.erros;
+        return a.tempo - b.tempo;
+      });
+
+      localStorage.setItem("rankingCuradoriaOJSLocal", JSON.stringify(ranking.slice(0, 10)));
+    }
+
+    document.getElementById("restart-btn").addEventListener("click", function() {
+      const confirmar = confirm("Deseja reiniciar o jogo atual?");
+      if (!confirmar) return;
+      initGame();
+    });
+
+    function formatTempo(seconds) {
+      if (!seconds || isNaN(seconds)) return "0:00";
+
+      const min = Math.floor(seconds / 60);
+      const sec = seconds % 60;
+
+      return `${min}:${String(sec).padStart(2, "0")}`;
+    }
+
+    function escapeHtml(text) {
+      return String(text || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+  </script>
+
+</body>
+</html>
