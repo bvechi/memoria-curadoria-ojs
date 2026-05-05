@@ -120,13 +120,14 @@
       background: var(--azul-escuro);
       color: white;
       border: 0;
-      border-radius: 16px;
-      padding: 1rem 1.5rem;
+      border-radius: 18px;
+      padding: 1.05rem 1.7rem;
       font-weight: 900;
-      font-size: 1.05rem;
+      font-size: 1.08rem;
       cursor: pointer;
       box-shadow: 0 12px 26px rgba(23, 63, 103, 0.25);
       transition: transform 0.15s ease, background 0.15s ease;
+      min-height: 52px;
     }
 
     .primary-btn:hover {
@@ -138,30 +139,35 @@
       background: #334155;
       color: white;
       border: 0;
-      border-radius: 14px;
-      padding: 0.85rem 1rem;
+      border-radius: 16px;
+      padding: 0.95rem 1.25rem;
       font-weight: 800;
+      font-size: 1rem;
       cursor: pointer;
+      min-height: 50px;
     }
 
     .danger-btn {
       background: #b91c1c;
       color: white;
       border: 0;
-      border-radius: 14px;
-      padding: 0.85rem 1rem;
+      border-radius: 16px;
+      padding: 0.95rem 1.25rem;
       font-weight: 800;
       cursor: pointer;
+      min-height: 50px;
     }
 
     .outline-btn {
       background: white;
       color: var(--azul-escuro);
       border: 2px solid #bfdbfe;
-      border-radius: 14px;
-      padding: 0.85rem 1rem;
+      border-radius: 16px;
+      padding: 0.95rem 1.25rem;
       font-weight: 800;
+      font-size: 1 rem;
       cursor: pointer;
+      min-height: 50px;
     }
 
     .mechanics-grid {
@@ -291,22 +297,22 @@
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
-      gap: 0.7rem;
-      margin-bottom: 1rem;
+      gap: 0.9rem;
+      margin-bottom: 1.2rem 0 1.4rem;
     }
 
     .activity-board {
       display: grid;
-      grid-template-columns: minmax(260px, 360px) 1fr;
-      gap: 1rem;
+      grid-template-columns: minmax(300px, 390px) 1fr;
+      gap: 1.3rem;
       align-items: start;
     }
 
     .panel {
       background: white;
       border: 2px solid #dbeafe;
-      border-radius: 22px;
-      padding: 1rem;
+      border-radius: 24px;
+      padding: 1.25rem;
       box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
     }
 
@@ -318,9 +324,9 @@
 
     .panel-note {
       color: var(--cinza);
-      font-size: 0.9rem;
-      margin: 0 0 1rem;
-      line-height: 1.35;
+      font-size: 1rem;
+      margin: 0 0 1.2rem;
+      line-height: 1.55;
     }
 
     .draggable-list {
@@ -332,14 +338,20 @@
       background: var(--azul-escuro);
       color: white;
       border: 0;
-      border-radius: 16px;
-      padding: 0.9rem;
+      border-radius: 18px;
+      padding: 1.05rem 1rem;
       font-weight: 900;
+      font-size: 1.03rem;
+      line-height: 1.35;
       text-align: center;
       cursor: grab;
       box-shadow: 0 8px 16px rgba(23, 63, 103, 0.18);
       user-select: none;
       transition: transform 0.15s ease, opacity 0.15s ease, outline 0.15s ease;
+      min-height: 58px;
+      display: flex;
+      align-itens: center;
+      justify-content: center;
     }
 
     .field-card:hover {
@@ -368,17 +380,17 @@
     }
 
     .drop-zone {
-      min-height: 108px;
+      min-height: 132px;
       background: #f8fafc;
       border: 2px dashed #93c5fd;
-      border-radius: 18px;
-      padding: 0.85rem;
+      border-radius: 20px;
+      padding: 1.05rem;
       cursor: pointer;
       transition: background 0.15s ease, border 0.15s ease, transform 0.15s ease;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 0.75rem;
+      gap: 0.9rem;
     }
 
     .drop-zone:hover {
@@ -400,22 +412,22 @@
 
     .drop-text {
       color: #1e293b;
-      font-size: 0.92rem;
-      line-height: 1.35;
+      font-size: 1rem;
+      line-height: 1.5;
       font-weight: 700;
     }
 
     .drop-answer {
-      min-height: 32px;
-      border-radius: 12px;
+      min-height: 38px;
+      border-radius: 14px;
       background: white;
       color: var(--verde);
       font-weight: 900;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 0.45rem;
-      font-size: 0.92rem;
+      padding: 0.55rem 0.7rem;
+      font-size: 0.98rem;
       border: 1px solid #bbf7d0;
     }
 
