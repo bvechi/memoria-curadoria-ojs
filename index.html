@@ -42,6 +42,43 @@
       display: none !important;
     }
 
+    #orientation-warning {
+      display: none;
+    }
+
+    .orientation-card {
+      width: min(420px, 90vw);
+      background: white;
+      border: 3px solid #bfdbfe;
+      border-radius: 28px;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: 0 24px 70px rgba(15, 23, 42, 0.22);
+    }
+
+    .orientation-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+
+    .orientation-card h1 {
+      margin: 0 0 0.8rem;
+      color: var(--azul-escuro);
+      font-size: 2rem;
+    }
+
+    .orientation-card p {
+      margin: 0.4rem 0;
+      color: #334155;
+      font-size: 1.1rem;
+      line-height: 1.5;
+    }
+
+    .orientation-small {
+      color: #64748b !important;
+      font-size: 0.95rem !important;
+    }
+
     .screen {
       min-height: 100vh;
       width: 100%;
@@ -165,7 +202,7 @@
       border-radius: 16px;
       padding: 0.95rem 1.25rem;
       font-weight: 800;
-      font-size: 1 rem;
+      font-size: 1rem;
       cursor: pointer;
       min-height: 50px;
     }
@@ -298,7 +335,7 @@
       justify-content: center;
       flex-wrap: wrap;
       gap: 0.9rem;
-      margin-bottom: 1.2rem 0 1.4rem;
+      margin: 1.2rem 0 1.4rem;
     }
 
     .activity-board {
@@ -350,7 +387,7 @@
       transition: transform 0.15s ease, opacity 0.15s ease, outline 0.15s ease;
       min-height: 58px;
       display: flex;
-      align-itens: center;
+      align-items: center;
       justify-content: center;
     }
 
@@ -630,10 +667,241 @@
         padding: 0.75rem;
       }
     }
+
+    @media screen and (max-width: 900px) and (orientation: portrait) {
+      #orientation-warning {
+        display: flex;
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+        padding: 1.25rem;
+        background:
+          radial-gradient(circle at top left, rgba(96, 165, 250, 0.35), transparent 34%),
+          radial-gradient(circle at bottom right, rgba(14, 165, 233, 0.28), transparent 35%),
+          linear-gradient(135deg, #eff6ff 0%, #ffffff 48%, #dbeafe 100%);
+      }
+
+      body > *:not(#orientation-warning) {
+        display: none !important;
+      }
+    }
+
+    @media screen and (max-width: 900px) and (orientation: landscape) {
+      #jogo {
+        padding: 0.7rem;
+      }
+
+      .screen {
+        padding: 0.8rem;
+      }
+
+      .intro-card {
+        padding: 1.2rem;
+        border-radius: 22px;
+        max-height: 94vh;
+        overflow-y: auto;
+      }
+
+      .intro-title {
+        font-size: clamp(1.7rem, 5vw, 2.6rem);
+        line-height: 1.05;
+      }
+
+      .intro-subtitle {
+        font-size: 0.95rem;
+        line-height: 1.35;
+        margin: 0.8rem 0 1rem;
+      }
+
+      .tag {
+        margin-bottom: 0.7rem;
+      }
+
+      .mechanics-grid {
+        grid-template-columns: 1fr 300px;
+        gap: 1rem;
+        margin-top: 0.9rem;
+      }
+
+      .mechanic-item {
+        padding: 0.7rem;
+        gap: 0.65rem;
+      }
+
+      .mechanic-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 0.95rem;
+      }
+
+      .name-box {
+        padding: 0.9rem;
+      }
+
+      .game-header h1 {
+        font-size: 1.45rem;
+      }
+
+      .game-header p {
+        font-size: 0.9rem;
+      }
+
+      .stats-row {
+        gap: 0.4rem;
+        margin: 0.55rem 0;
+      }
+
+      .stat-card {
+        padding: 0.4rem 0.55rem;
+        font-size: 0.78rem;
+      }
+
+      .toolbar {
+        gap: 0.4rem;
+        margin: 0.55rem 0 0.75rem;
+      }
+
+      .toolbar button {
+        padding: 0.55rem 0.65rem;
+        min-height: 38px;
+        font-size: 0.78rem;
+        border-radius: 12px;
+      }
+
+      .game-layout {
+        grid-template-columns: 1fr;
+        gap: 0.7rem;
+      }
+
+      .leaderboard-card {
+        position: static;
+        padding: 0.75rem;
+      }
+
+      .leaderboard-top h2 {
+        font-size: 1rem;
+      }
+
+      .leaderboard-sub {
+        font-size: 0.75rem;
+        margin-bottom: 0.45rem;
+      }
+
+      .rank-item {
+        padding: 0.35rem 0;
+      }
+
+      .rank-name {
+        font-size: 0.78rem;
+      }
+
+      .rank-meta {
+        font-size: 0.68rem;
+      }
+
+      .rank-points {
+        font-size: 1rem;
+      }
+
+      .activity-board {
+        grid-template-columns: 235px 1fr;
+        gap: 0.7rem;
+      }
+
+      .panel {
+        padding: 0.75rem;
+        border-radius: 18px;
+      }
+
+      .panel h2 {
+        font-size: 0.95rem;
+      }
+
+      .panel-note {
+        font-size: 0.78rem;
+        line-height: 1.3;
+        margin-bottom: 0.6rem;
+      }
+
+      .field-card {
+        padding: 0.6rem;
+        min-height: 38px;
+        font-size: 0.78rem;
+        border-radius: 12px;
+      }
+
+      .draggable-list {
+        gap: 0.42rem;
+      }
+
+      .drop-grid {
+        grid-template-columns: repeat(2, minmax(170px, 1fr));
+        gap: 0.5rem;
+      }
+
+      .drop-zone {
+        min-height: 84px;
+        padding: 0.6rem;
+        gap: 0.45rem;
+        border-radius: 14px;
+      }
+
+      .drop-text {
+        font-size: 0.74rem;
+        line-height: 1.25;
+      }
+
+      .drop-answer {
+        min-height: 28px;
+        font-size: 0.72rem;
+        padding: 0.3rem 0.4rem;
+        border-radius: 10px;
+      }
+
+      .modal-card {
+        width: min(560px, 92vw);
+        padding: 1rem;
+        border-radius: 20px;
+      }
+
+      .modal-icon {
+        font-size: 2.2rem;
+      }
+
+      .modal-title {
+        font-size: 1.25rem;
+      }
+
+      .modal-message {
+        font-size: 0.88rem;
+        line-height: 1.38;
+      }
+
+      .modal-actions {
+        margin-top: 0.8rem;
+      }
+
+      .modal-actions button {
+        padding: 0.65rem 0.85rem;
+        min-height: 40px;
+        font-size: 0.82rem;
+      }
+    }
   </style>
 </head>
 
 <body>
+
+  <div id="orientation-warning">
+    <div class="orientation-card">
+      <div class="orientation-icon">📱↔️</div>
+      <h1>Vire o celular</h1>
+      <p>Para jogar melhor, use o aparelho na horizontal.</p>
+      <p class="orientation-small">Depois de virar, o jogo aparecerá automaticamente.</p>
+    </div>
+  </div>
 
   <section id="tela1" class="screen">
     <div class="decor-circle circle-1"></div>
